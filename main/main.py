@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 
-from database import init_db, add_mentions, del_mentions, get_mentions
+from database import init_db, add_note, get_note, del_note
 
 
 dp = Dispatcher()
@@ -24,21 +24,27 @@ async def cmd_str(message: Message):
 
 @router.message(Command('add'))
 async def cmd_add(message: Message):
-    add_mentions(message.from_user.id, message.text)
+    note_add = message.text
+    add_note(note_add)
     await message.answer('Твоя Заметка добавлена✅!')
 
 @router.message(Command('list'))
 async def cmd_list(message: Message):
-    notes = get_mentions(message.from_user.id)
+    notes = get_note(message.from_user.id)
     if not notes:
         await message.answer('У вас нет заметок🤷!')
     else:
+        text = '\n'.join([f'{note[0]}. {note[1]}'for note in notes])
+        await message.answer(f'Ваши заметки: \n\n{text}')
 
 
 @router.message(Command('del'))
 async def cmd_del(message: Message):
-    del_mentions(message.from_user.id,message.text)
-    await message.answer("Заметка удалена🗑!")
+    note_id = int(message.text)
+    if del_note(note_id):
+        await message.answer("Заметка удалена🗑!")
+    else:
+        await message.answer('Заметка с таким номером не найдена!')
 
 
 
