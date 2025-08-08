@@ -7,26 +7,27 @@ def init_db():
         cur.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                mentions TEXT
+                tg_id INTEGER,
+                note TEXT
             )
         """)
         conn.commit()
 
-def add_mentions(mentions: str):
+def add_note(note: str):
     with sqlite3.connect('book.db') as conn:
         cur = conn.cursor()
-        cur.execute("INSERT INTO users(mentions) VALUES (?)",(mentions,))
+        cur.execute("INSERT INTO users(note) VALUES (?)",(note,))
         conn.commit()
 
-def get_mentions(user_id: int):
+def get_note(user_id: int):
     with sqlite3.connect('book.db') as conn:
         cur = conn.cursor()
-        cur.execute("SELECT mentions FROM users WHERE user_id=?", (user_id,))
+        cur.execute("SELECT note FROM users WHERE user_id=?", (user_id,))
         row = cur.fetchall()
-        return [row[0] for row in row]
+        return [r[0] for r in row]
 
-def del_mentions(mentions: str):
+def del_note(note: str):
     with sqlite3.connect('book.db') as conn:
         cur = conn.cursor()
-        cur.execute("DELETE FROM user WHERE mentions=?",(mentions,))
+        cur.execute("DELETE FROM users WHERE note=?",(note,))
         conn.commit()
